@@ -2,7 +2,6 @@ import feedparser
 import logging
 import json
 from datetime import datetime
-from requests.exceptions import Timeout, RequestException
 from requests_cache import CachedSession
 from time import mktime
 
@@ -27,12 +26,20 @@ def get_json_feed_content(url, offset=0, limit=None):
 
     try:
         response = cached_request.get(url, timeout=requests_timeout)
-        content = json.loads(response.text)
-    except RequestException as request_error:
+        response.raise_for_status()
+    except Exception as request_error:
         logger.warning(
             'Attempt to get feed failed: {}'.format(str(request_error))
         )
         return False
+
+    try:
+        content = json.loads(response.text)
+    except Exception as parse_error:
+        logger.warning(
+            'Failed to parse feed from {}: {}'.format(url, str(parse_error))
+        )
+    return False
 
     return content[offset:end]
 
@@ -47,12 +54,19 @@ def get_rss_feed_content(url, offset=0, limit=None, exclude_items_in=None):
     try:
         response = cached_request.get(url, timeout=requests_timeout)
         response.raise_for_status()
-        content = feedparser.parse(response.text).entries
-    except RequestException as request_error:
+    except Exception as request_error:
         logger.warning(
             'Attempt to get feed failed: {}'.format(str(request_error))
         )
         return False
+
+    try:
+        content = feedparser.parse(response.text).entries
+    except Exception as parse_error:
+        logger.warning(
+            'Failed to parse feed from {}: {}'.format(url, str(parse_error))
+        )
+    return False
 
     if exclude_items_in:
         exclude_ids = [item['guid'] for item in exclude_items_in]
