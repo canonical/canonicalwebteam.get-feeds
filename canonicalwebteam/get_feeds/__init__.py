@@ -39,7 +39,7 @@ def get_json_feed_content(url, offset=0, limit=None):
         logger.warning(
             'Failed to parse feed from {}: {}'.format(url, str(parse_error))
         )
-    return False
+        return False
 
     return content[offset:end]
 
@@ -66,7 +66,7 @@ def get_rss_feed_content(url, offset=0, limit=None, exclude_items_in=None):
         logger.warning(
             'Failed to parse feed from {}: {}'.format(url, str(parse_error))
         )
-    return False
+        return False
 
     if exclude_items_in:
         exclude_ids = [item['guid'] for item in exclude_items_in]
