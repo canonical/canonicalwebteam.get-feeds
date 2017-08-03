@@ -1,2 +1,3 @@
 v0.1.0, 2017-08-03 -- Initial release
 v0.1.1, 2017-08-03 -- Update README
+v0.1.2, 2017-08-03 -- Fix error handling for RSS function too
