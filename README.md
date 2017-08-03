@@ -2,7 +2,15 @@
 
 Functions and template tags for retrieving content from JSON or RSS feeds.
 
+## Installation
+
+``` bash
+pip install canonicalwebteam.get-feeds
+```
+
 ## Usage
+
+Feeds can be loaded either using Python functions or in Django templates:
 
 ### Functions
 
