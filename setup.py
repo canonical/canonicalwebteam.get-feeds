@@ -6,7 +6,7 @@ setup(
     author='Canonical Webteam',
     url='https://github.com/canonical-webteam/get-feeds',
     packages=[
-        'canonicalwebteam.get-feeds'
+        'canonicalwebteam.get_feeds'
     ],
     description=(
         'Functions and template tags for retrieving JSON '
