@@ -1,31 +1,54 @@
-# canonicalwebteam.yaml_deleted_paths
+# canonicalwebteam.get-feeds
 
-Serve `410`s for deleted pages listed in a `deleted.yaml` file.
+Functions and template tags for retrieving content from JSON or RSS feeds.
 
 ## Usage
 
-Create `deleted.yaml` similar to the following:
+### Functions
 
-``` yaml
-some/path: {"message": "This page is gone!"}
-# etc.
-```
-
-And a `410.html` template page:
-
-``` html
-<html><body><h1>Deleted</h1><p>{{ message }}</p></body></html>
-```
-
-And add the module to your Django app:
+Two functions are provided, which you can use in your views:
 
 ``` python
-# urls.py
-from canonicalwebteam import yaml_deleted_paths
+from canonicalwebteam.get_feeds import (
+    get_json_feed_content,
+    get_rss_feed_content
+)
 
-urlpatterns = yaml_deleted_paths.create_views()
-# ...
+items_dict = get_json_feed_content(
+    url="https://example.com/api/items",
+    offset=20, # optional
+    limit=10 # optional
+)
+posts_dict = get_json_feed_content(
+    url="https://example.com/feed.rss",
+    offset=20, # optional
+    limit=10, # optional
+    exclude_items_in={} # optional
+)
 ```
 
-Now if you visit `http://your-site/some/path` you should see your `410`
-error page.
+### Template tags
+
+Or you can include Django templatetags:
+
+``` python
+# settings.py
+
+TEMPLATES['OPTIONS']['builtins'].append(
+    'canonicalwebteam.get_feeds.templatetags'
+)
+```
+
+And then get the feed content in templates:
+
+``` html
+<h1>Items:</h1>
+{% get_json_feed "https://example.com/api/items" limit=10 as items %}
+<ul>{% for item in items %}<li>{{ item.name }}{% endfor %}</ul>
+
+<h1>Posts:</h1>
+{% get_rss_feed "https://example.com/feed.rss" limit=10 as posts %}
+<ul>
+{% for post in posts %}<li>{{ post.title }}{% endfor %}
+</ul>
+```
