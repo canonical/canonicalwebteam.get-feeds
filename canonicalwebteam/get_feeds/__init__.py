@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
-requests_timeout = getattr(settings, 'FEED_TIMEOUT', 60)
+requests_timeout = getattr(settings, 'FEED_TIMEOUT', 10)
 expiry_seconds = getattr(settings, 'FEED_EXPIRY', 300)
 
 cached_request = CachedSession(
@@ -28,14 +28,6 @@ def get_json_feed_content(url, offset=0, limit=None):
     try:
         response = cached_request.get(url, timeout=requests_timeout)
         content = json.loads(response.text)
-    except Timeout as timeout_error:
-        logger.warning(
-            'Attempt to get feed timed out after {} seconds: {}'.format(
-                requests_timeout,
-                str(timeout_error)
-            )
-        )
-        return False
     except RequestException as request_error:
         logger.warning(
             'Attempt to get feed failed: {}'.format(str(request_error))
@@ -54,21 +46,20 @@ def get_rss_feed_content(url, offset=0, limit=None, exclude_items_in=None):
 
     try:
         response = cached_request.get(url, timeout=requests_timeout)
+        response.raise_for_status()
         content = feedparser.parse(response.text).entries
-    except Timeout as timeout_error:
+    except RequestException as request_error:
         logger.warning(
-            'Attempt to get feed timed out after {}. Message: {}'.format(
-                requests_timeout,
-                str(timeout_error)
-            )
+            'Attempt to get feed failed: {}'.format(str(request_error))
         )
-        raise timeout_error
+        return False
 
     if exclude_items_in:
         exclude_ids = [item['guid'] for item in exclude_items_in]
         content = [item for item in content if item['guid'] not in exclude_ids]
 
     content = content[offset:end]
+
     for item in content:
         updated_time = mktime(item['updated_parsed'])
         item['updated_datetime'] = datetime.fromtimestamp(updated_time)
