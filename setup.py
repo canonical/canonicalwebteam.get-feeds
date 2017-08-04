@@ -6,6 +6,7 @@ setup(
     author='Canonical Webteam',
     url='https://github.com/canonical-webteam/get-feeds',
     packages=[
+        'canonicalwebteam',
         'canonicalwebteam.get_feeds'
     ],
     description=(
