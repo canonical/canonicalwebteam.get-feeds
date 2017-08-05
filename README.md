@@ -52,11 +52,18 @@ And then get the feed content in templates:
 ``` html
 <h1>Items:</h1>
 {% get_json_feed "https://example.com/api/items" limit=10 as items %}
-<ul>{% for item in items %}<li>{{ item.name }}{% endfor %}</ul>
+{% if items is False %}
+  <p>Feed failed to load</p>
+{% else %}
+  <ul>{% for item in items %}<li>{{ item.name }}{% endfor %}</ul>
+{% endif %}
 
 <h1>Posts:</h1>
 {% get_rss_feed "https://example.com/feed.rss" limit=10 as posts %}
-<ul>
-{% for post in posts %}<li>{{ post.title }}{% endfor %}
-</ul>
+{% if items is False %}
+  <p>Feed failed to load</p>
+{% else %}
+<ul>{% for post in posts %}<li>{{ post.title }}{% endfor %}</ul>
+{% endif %}
 ```
+
