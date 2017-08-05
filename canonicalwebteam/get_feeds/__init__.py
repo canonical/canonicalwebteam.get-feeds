@@ -61,7 +61,11 @@ def get_rss_feed_content(url, offset=0, limit=None, exclude_items_in=None):
         return False
 
     try:
-        content = feedparser.parse(response.text).entries
+        feed_data = feedparser.parse(response.text)
+        if not feed_data.feed:
+            logger.warning('No valid feed data found at {}'.format(url))
+            return False
+        content = feed_data.entries
     except Exception as parse_error:
         logger.warning(
             'Failed to parse feed from {}: {}'.format(url, str(parse_error))

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='canonicalwebteam.get-feeds',
-    version='0.1.6',
+    version='0.1.7',
     author='Canonical Webteam',
     url='https://github.com/canonical-webteam/get-feeds',
     packages=[
