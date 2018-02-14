@@ -7,3 +7,4 @@ v0.1.5, 2017-08-04 -- Python2 compatible namespacing
 v0.1.6, 2017-08-05 -- Specify requests-cache as dependency
 v0.1.7, 2017-08-05 -- Check for valid RSS feed properly
 v0.2.1, 2018-02-12 -- Add prometheus metric exports
+v0.2.2, 2018-02-12 -- Measure request time with requests library core features - more accurate
