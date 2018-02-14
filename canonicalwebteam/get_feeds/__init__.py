@@ -36,9 +36,7 @@ cached_request = CachedSession(
 
 def _get(url):
     try:
-        request_start = time.time()
         response = cached_request.get(url, timeout=requests_timeout)
-        request_time = time.time() - request_start
 
         if response.from_cache:
             requested_from_cache_counter.labels(
@@ -48,7 +46,7 @@ def _get(url):
             request_latency_seconds.labels(
                 url=url,
                 code=response.status_code
-            ).observe(request_time)
+            ).observe(response.elapsed.total_seconds())
 
         response.raise_for_status()
     except Exception as request_error:
