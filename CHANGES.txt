@@ -9,3 +9,4 @@ v0.1.7, 2017-08-05 -- Check for valid RSS feed properly
 v0.2.1, 2018-02-12 -- Add prometheus metric exports
 v0.2.2, 2018-02-12 -- Measure request time with requests library core features - more accurate
 v0.2.3, 2018-02-16 -- Make buckets more succinct in prometheus metrics
+v0.2.4, 2018-02-16 -- Python2 compatible urlparse
