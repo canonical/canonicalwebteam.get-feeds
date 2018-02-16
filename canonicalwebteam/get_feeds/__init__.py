@@ -6,28 +6,31 @@ from datetime import datetime
 from requests_cache import CachedSession
 from django.conf import settings
 from prometheus_client import Counter, Histogram
+from urllib.parse import urlparse
 
+
+# Settings
+requests_timeout = getattr(settings, 'FEED_TIMEOUT', 10)
+expiry_seconds = getattr(settings, 'FEED_EXPIRY', 300)
+logger = logging.getLogger(__name__)
 
 # Prometheus metric exporters
 requested_from_cache_counter = Counter(
     'feed_requested_from_cache',
     'A counter of requests retrieved from the cache',
-    ['url'],
+    ['domain'],
 )
 failed_requests = Counter(
     'feed_failed_requests',
     'A counter of requests retrieved from the cache',
-    ['error_name', 'url'],
+    ['error_name', 'domain'],
 )
 request_latency_seconds = Histogram(
     'feed_request_latency_seconds',
     'Feed requests retrieved',
-    ['url', 'code'],
+    ['domain', 'code'],
+    buckets=[0.25, 0.5, 0.75, 1, requests_timeout],
 )
-
-logger = logging.getLogger(__name__)
-requests_timeout = getattr(settings, 'FEED_TIMEOUT', 10)
-expiry_seconds = getattr(settings, 'FEED_EXPIRY', 300)
 
 cached_request = CachedSession(
     expire_after=expiry_seconds,
@@ -40,19 +43,19 @@ def _get(url):
 
         if response.from_cache:
             requested_from_cache_counter.labels(
-                url=url
+                domain=urlparse(url).netloc,
             ).inc()
         else:
             request_latency_seconds.labels(
-                url=url,
-                code=response.status_code
+                domain=urlparse(url).netloc,
+                code=response.status_code,
             ).observe(response.elapsed.total_seconds())
 
         response.raise_for_status()
     except Exception as request_error:
         failed_requests.labels(
             error_name=type(request_error).__name__,
-            url=url
+            domain=urlparse(url).netloc,
         ).inc()
         logger.warning(
             'Attempt to get feed failed: {}'.format(str(request_error))
