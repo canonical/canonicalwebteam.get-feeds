@@ -6,7 +6,10 @@ from datetime import datetime
 from requests_cache import CachedSession
 from django.conf import settings
 from prometheus_client import Counter, Histogram
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 # Settings
